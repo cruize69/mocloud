@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="author" content="Mohammad Juwel">
+<meta name="description" content="Go/no-go model for a CAVA kitchen in a CloudKitchens facility, by Mohammad Juwel.">
+<meta name="theme-color" content="#f4f7f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1412" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Go/No-Go">
+<title>CAVA × CloudKitchens · Mohammad Juwel</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f766e'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' stroke='white' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#f4f7f6;--card:#fff;--ink:#13201c;--mute:#5d6c67;--line:#dfe6e3;--acc:#0f766e;--accbg:#dcf1ec;
+--go:#15803d;--gobg:#dcfce7;--no:#c2410c;--nobg:#ffedd5;--fix:#8a5a12;--fixbg:#fbf1df;
+--c-food:#d97706;--c-plat:#7c3aed;--c-site:#2563eb;--c-labor:#db2777;--c-mkt:#0891b2;--c-cann:#dc2626;--c-sales:#94a3b8;
+--sans:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1412;--card:#16201d;--ink:#eaf1ee;--mute:#9db1aa;--line:#28352f;--acc:#2dd4bf;--accbg:#113833;
+--go:#4ade80;--gobg:#0f2e1e;--no:#fb923c;--nobg:#3a2010;--fix:#fbbf24;--fixbg:#352710;
+--c-food:#fbbf24;--c-plat:#a78bfa;--c-site:#60a5fa;--c-labor:#f472b6;--c-mkt:#22d3ee;--c-cann:#f87171;--c-sales:#64748b;color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.4 var(--sans);padding:0 max(16px,env(safe-area-inset-right)) calc(32px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top);background:var(--bg);z-index:3}
+main{max-width:560px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:24px;line-height:1.15;margin:20px 0 4px;letter-spacing:-.01em}
+.by{margin:0;color:var(--mute);font-size:15px}
+.by b{color:var(--ink);font-weight:600}
+
+#verdict{position:sticky;top:env(safe-area-inset-top);z-index:2;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center;padding:14px 16px;border-radius:18px;background:var(--gobg);border:2px solid var(--go);transition:background .3s,border-color .3s;box-shadow:0 6px 18px -12px rgba(0,0,0,.35)}
+#verdict.no{background:var(--nobg);border-color:var(--no)}
+#pill{grid-row:span 2;font-weight:800;font-size:20px;padding:12px 14px;border-radius:12px;color:#fff;background:var(--go);transition:background .3s;min-width:78px;text-align:center}
+.no #pill{background:var(--no)}
+#nums{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
+#nums div{display:grid}
+#nums b{font:700 26px var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+#nums span{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+#why{font-size:14px;color:var(--ink)}
+
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chips button{font:600 15px var(--sans);color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:14px;min-height:52px;padding:6px 8px;line-height:1.15;cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--card)}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+
+section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:4px 16px 14px}
+h2{font-size:19px;margin:14px 0 4px;display:flex;align-items:center;gap:8px}
+.sub{margin:0 0 6px;font-size:14px;color:var(--mute)}
+
+.ctl{padding:14px 0;border-top:1px solid var(--line)}
+.ctl:first-of-type{border-top:0}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.top label{font-weight:600;font-size:16px}
+.note{font-size:13px;color:var(--mute);margin-top:6px}
+.step{display:grid;grid-template-columns:52px 1fr 52px;gap:8px;margin-top:10px;align-items:center}
+.step button{height:52px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:600 26px/1 var(--sans);cursor:pointer;touch-action:manipulation}
+.step button:active{background:var(--accbg);transform:scale(.96)}
+.field{position:relative;display:flex;align-items:center;justify-content:center;height:52px;border-radius:14px;background:var(--bg);border:1.5px solid var(--line);font:600 20px var(--mono)}
+.field input{width:100%;height:100%;border:0;background:transparent;color:var(--ink);font:inherit;text-align:center;font-variant-numeric:tabular-nums;padding:0 34px}
+.field i{position:absolute;font-style:normal;color:var(--mute);font-size:15px;font-weight:500}
+.field .pre{left:14px}.field .suf{right:14px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:36px;background:transparent;margin:8px 0 0}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:8px;background:linear-gradient(var(--acc),var(--acc)) 0/var(--p,50%) 100% no-repeat,var(--line)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:var(--card);border:3px solid var(--acc);margin-top:-11px;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+input[type=range]::-moz-range-track{height:8px;border-radius:8px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:8px;border-radius:8px;background:var(--acc)}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--card);border:3px solid var(--acc)}
+.pctl{font:600 13px var(--mono);color:var(--acc);margin-top:6px}
+
+.pl{display:grid;gap:10px;margin:6px 0 4px}
+.ln{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:baseline}
+.ln .l{font-size:15px;display:flex;align-items:center;gap:8px}
+.ln .l::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--c)}
+.ln .r{font:600 16px var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.ln .r small{font:500 13px var(--mono);color:var(--mute);margin-left:8px}
+.bar{grid-column:1/-1;height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:6px;background:var(--c);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.ln.tot{padding-top:10px;border-top:2px solid var(--ink)}
+.ln.tot .l{font-weight:700;font-size:16px}
+.ln.tot .r{font-size:18px}
+.ln.tot .bar{height:16px;border-radius:8px}
+.roic{display:grid;grid-template-columns:1fr auto;align-items:center;margin-top:12px;padding:14px;border-radius:14px;background:var(--accbg)}
+.roic b{font:700 24px var(--mono)}
+.roic span{font-size:14px;color:var(--mute)}
+.roic strong{display:block;font-size:16px}
+
+.fixed{border-color:var(--fix);border-width:1.5px}
+.tag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--fix);background:var(--fixbg);padding:4px 9px;border-radius:999px}
+.fixed .ctl.edited label::after{content:" · edited";color:var(--fix);font-size:13px}
+.fixed .step button,.fixed .field{height:48px}
+#reset{width:100%;min-height:52px;margin-top:6px;border-radius:14px;border:1.5px solid var(--fix);background:var(--fixbg);color:var(--fix);font:700 16px var(--sans);cursor:pointer}
+footer{font-size:13px;color:var(--mute);text-align:center;line-height:1.5}
+footer b{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>CAVA × CloudKitchens</h1>
+    <p class="by">Kitchen unit economics · <b>Mohammad Juwel</b></p>
+  </header>
+
+  <div id="verdict" aria-live="polite">
+    <div id="pill">GO</div>
+    <div id="nums"><div><b id="n-roic">0%</b><span>ROIC</span></div><div><b id="n-net">$0K</b><span>Profit / yr</span></div></div>
+    <div id="why"></div>
+  </div>
+
+  <div class="chips" role="group" aria-label="Scenarios">
+    <button data-p="base" aria-pressed="true">Las Vegas</button>
+    <button data-p="low">Low case</button>
+    <button data-p="overlap">Overlaps a restaurant</button>
+  </div>
+
+  <section><h2>Key inputs</h2><div id="key"></div></section>
+
+  <section>
+    <h2>Kitchen P&amp;L</h2>
+    <p class="sub">Per year · bars show share of sales</p>
+    <div class="pl" id="pl"></div>
+    <div class="roic"><div><strong>ROIC</strong><span id="roic-s"></span></div><b id="roic-v"></b></div>
+  </section>
+
+  <section class="fixed">
+    <h2>Fixed assumptions <span class="tag">Editable</span></h2>
+    <p class="sub">Held constant across scenarios.</p>
+    <div id="fixed"></div>
+    <button id="reset">Reset fixed assumptions</button>
+  </section>
+
+  <footer><b>Mohammad Juwel</b><br>$K per kitchen per year · Sources: CAVA Q3 2026 filings and call, CloudKitchens site, BLS, delivery app pricing</footer>
+</main>
+
+<script>
+// [id, label, prefix, suffix, min, max, step, note]
+const KEY=[
+ ["sales","Kitchen sales","$","K",300,3000,50,""],
+ ["comm","Delivery commission","","%",0,30,.5,"App rates 15% to 30%"],
+ ["fee","Facility fee / month","$","",2000,12000,250,"Tenant reports $4K to $7K"],
+ ["staff","Kitchen staff","","FTE",1,15,1,"CloudKitchens says 3 to 5; CAVA productivity implies 8"],
+ ["cann","Sales moved from CAVA restaurants","","%",0,80,5,"0% if no CAVA restaurant delivers to the area"],
+ ["upfront","Upfront investment","$","K",30,400,10,"CloudKitchens cites $100K to $200K"]];
+// [id, label, prefix, suffix, default, step, note]
+const FIX=[
+ ["food","Food and packaging","","%",29.65,.5,"CAVA, 40 weeks to Oct 4, 2026"],
+ ["proc","Processing fee","","%",3,.5,"Press reports of tenant terms"],
+ ["mkt","Marketing","","%",6,.5,"Assumed; Uber platform average ~2%"],
+ ["sup","Supplies and misc","","%",2,.5,"Assumed"],
+ ["pay","Cost per staff","$","K",50.31,1,"Las Vegas cook pay + benefits"],
+ ["flow","Restaurant profit lost per $ moved","","%",24.74,1,"CAVA restaurant margin"],
+ ["hurdle","Required ROIC","","%",40,5,"CAVA: 40%+ year-one cash-on-cash"]];
+const SC={base:[1600,15,7500,8,0,150],low:[926,15,7500,8,0,150],overlap:[1600,15,7500,8,25,150]};
+const PCT=[[10,926],[20,1100],[30,1200],[40,1400],[50,1600],[60,1700],[70,1800],[80,2200],[90,2900]];
+const LINES=[["Food and packaging","--c-food"],["Delivery commission","--c-plat"],["Processing fee","--c-plat"],["Facility fee","--c-site"],["Labor","--c-labor"],["Marketing","--c-mkt"],["Supplies and misc","--c-mkt"]];
+
+const $=id=>document.getElementById(id), num=id=>+$(id).value||0;
+const ctl=(id,l,pre,suf,step,extra)=>`<div class="ctl" id="${id}-w"><div class="top"><label for="${id}">${l}</label></div>
+ <div class="step"><button type="button" data-d="-1" data-t="${id}" aria-label="Decrease ${l}">−</button>
+ <div class="field">${pre?`<i class="pre">${pre}</i>`:""}<input type="number" id="${id}" step="${step}" inputmode="decimal">${suf?`<i class="suf">${suf}</i>`:""}</div>
+ <button type="button" data-d="1" data-t="${id}" aria-label="Increase ${l}">+</button></div>${extra||""}</div>`;
+
+$("key").innerHTML=KEY.map(([id,l,p,s,mn,mx,st,n])=>ctl(id,l,p,s,st,
+ `<input type="range" id="${id}-r" min="${mn}" max="${mx}" step="${st}" aria-label="${l}">${id==="sales"?'<div class="pctl" id="pctl"></div>':""}${n?`<div class="note">${n}</div>`:""}`)).join("");
+$("fixed").innerHTML=FIX.map(([id,l,p,s,d,st,n])=>ctl(id,l,p,s,st,`<div class="note">${n}</div>`)).join("");
+FIX.forEach(f=>$(f[0]).value=f[4]);
+
+$("pl").innerHTML=[["Sales","--c-sales"],...LINES,["Cannibalization","--c-cann"],["Profit after cannibalization","--go"]].map(([l,c],i)=>
+ `<div class="ln${i===9?" tot":""}" style="--c:var(${c})" id="ln${i}"><div class="l">${l}</div><div class="r"><span></span><small></small></div><div class="bar"><i></i></div></div>`).join("");
+
+const meta=Object.fromEntries([...KEY.map(f=>[f[0],{min:f[4],max:f[5],step:f[6]}]),...FIX.map(f=>[f[0],{min:0,max:1e4,step:f[5]}])]);
+const fill=id=>{const r=$(id+"-r");if(r)r.style.setProperty("--p",(r.value-r.min)/(r.max-r.min)*100+"%")};
+const setv=(id,x,snap=true)=>{const m=meta[id];if(snap)x=Math.round(x/m.step)*m.step;x=Math.min(m.max,Math.max(m.min,x));x=+x.toFixed(2);$(id).value=x;const r=$(id+"-r");if(r){r.value=x;fill(id)}};
+
+const chips=[...document.querySelectorAll("[data-p]")];
+const press=p=>chips.forEach(b=>b.setAttribute("aria-pressed",b.dataset.p===p));
+const load=p=>{KEY.forEach((f,i)=>setv(f[0],SC[p][i],false));press(p);calc()};
+chips.forEach(b=>b.onclick=()=>load(b.dataset.p));
+document.addEventListener("click",e=>{const b=e.target.closest("[data-d]");if(!b)return;const id=b.dataset.t;setv(id,num(id)+meta[id].step*b.dataset.d);if(KEY.some(f=>f[0]===id))press();calc()});
+KEY.forEach(([id])=>{$(id).oninput=()=>{const r=$(id+"-r");r.value=$(id).value;fill(id);press();calc()};$(id+"-r").oninput=()=>{$(id).value=$(id+"-r").value;fill(id);press();calc()}});
+FIX.forEach(([id])=>$(id).oninput=calc);
+$("reset").onclick=()=>{FIX.forEach(f=>$(f[0]).value=f[4]);calc()};
+
+const K=n=>(n<0?"−$":"$")+Math.abs(Math.round(n)).toLocaleString()+"K";
+const P=n=>(n<0?"−":"")+(Math.round(Math.abs(n)*10+1e-6)/10).toFixed(1)+"%";
+const where=s=>s<926?"below the 10th percentile":s>=2900?"90th percentile or above":`about the ${PCT.filter(x=>s>=x[1]).pop()[0]}th percentile`;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const tweens=new Map();
+function tween(el,to,fmt){
+  const from=tweens.get(el)??to; tweens.set(el,to);
+  if(reduce||from===to){el.textContent=fmt(to);return}
+  const t0=performance.now(),d=450;
+  const step=t=>{const k=Math.min(1,(t-t0)/d),e=1-Math.pow(1-k,3);el.textContent=fmt(from+(to-from)*e);if(k<1&&tweens.get(el)===to)requestAnimationFrame(step)};
+  requestAnimationFrame(step);
+  setTimeout(()=>{if(tweens.get(el)===to)el.textContent=fmt(to)},d+60);
+}
+
+function calc(){
+  const S=num("sales"),U=num("upfront"),h=num("hurdle")/100;
+  const vals=[S*num("food")/100,S*num("comm")/100,S*num("proc")/100,num("fee")*.012,num("staff")*num("pay"),S*num("mkt")/100,S*num("sup")/100];
+  const cann=S*num("cann")*num("flow")/1e4, net=S-vals.reduce((a,b)=>a+b,0)-cann, roic=U?net/U:0, go=net>0&&roic>=h;
+  const m=1-(num("food")+num("comm")+num("proc")+num("mkt")+num("sup"))/100-num("cann")*num("flow")/1e4;
+  const need=m>0?(h*U+vals[3]+vals[4])/m:Infinity;
+  $("verdict").className=go?"":"no"; $("pill").textContent=go?"GO":"NO GO";
+  tween($("n-roic"),roic*100,x=>P(x)); tween($("n-net"),net,K);
+  $("why").textContent=(isFinite(need)?`Needs ${K(need)} sales (${where(need)}) to clear ${P(h*100)}.`:"No sales level clears the hurdle.")+(net>0?` Pays back in ${Math.round(U/net*12)} months.`:" Never pays back.");
+  $("pctl").textContent=`${K(S)} is ${where(S)} of CloudKitchens locations · median $1.6M`;
+  const rows=[S,...vals,cann,net];
+  rows.forEach((x,i)=>{const ln=$("ln"+i),neg=i>0&&i<9;
+    tween(ln.querySelector(".r span"),neg?-x:x,K);
+    ln.querySelector("small").textContent=S?P(Math.abs(x)/S*100):"";
+    ln.querySelector(".bar i").style.width=S?Math.min(100,Math.abs(x)/S*100)+"%":"0";
+  });
+  $("ln9").style.setProperty("--c",net<0?"var(--no)":"var(--go)");
+  tween($("roic-v"),roic*100,x=>P(x)); $("roic-s").textContent=`${K(net)} ÷ ${K(U)} upfront · hurdle ${P(h*100)}`;
+  $("roic-v").style.color=go?"var(--go)":"var(--no)";
+  FIX.forEach(([id,,,,d])=>$(id+"-w").classList.toggle("edited",Math.abs(num(id)-d)>1e-9));
+}
+load("base");
+</script>
+</body>
+</html>
