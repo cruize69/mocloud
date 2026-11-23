@@ -138,7 +138,7 @@ const KEY=[
  ["sales","Kitchen sales","$","K",300,3000,50,""],
  ["comm","Delivery commission","","%",0,30,.5,"App rates 15% to 30%"],
  ["fee","Facility fee / month","$","",2000,12000,250,"Tenant reports $4K to $7K"],
- ["staff","Kitchen staff","","FTE",1,15,1,"CloudKitchens says 3 to 5; CAVA productivity implies 8"],
+ ["staff","Kitchen staff","","FTE",1,15,1,"CAVA's ~$196K sales per employee: 8 at $1.6M, 5 at $926K"],
  ["cann","Sales moved from CAVA restaurants","","%",0,80,5,"0% if no CAVA restaurant delivers to the area"],
  ["upfront","Upfront investment","$","K",30,400,10,"CloudKitchens cites $100K to $200K"]];
 // [id, label, prefix, suffix, default, step, note]
@@ -150,7 +150,7 @@ const FIX=[
  ["pay","Cost per staff","$","K",50.31,1,"Las Vegas cook pay + benefits"],
  ["flow","Restaurant profit lost per $ moved","","%",24.74,1,"CAVA restaurant margin"],
  ["hurdle","Required ROIC","","%",40,5,"CAVA: 40%+ year-one cash-on-cash"]];
-const SC={base:[1600,15,7500,8,0,150],low:[926,15,7500,8,0,150],overlap:[1600,15,7500,8,25,150]};
+const SC={base:[1600,15,7500,8,0,150],low:[926,15,7500,5,0,150],overlap:[1600,15,7500,8,25,150]};
 const PCT=[[10,926],[20,1100],[30,1200],[40,1400],[50,1600],[60,1700],[70,1800],[80,2200],[90,2900]];
 const LINES=[["Food and packaging","--c-food"],["Delivery commission","--c-plat"],["Processing fee","--c-plat"],["Facility fee","--c-site"],["Labor","--c-labor"],["Marketing","--c-mkt"],["Supplies and misc","--c-mkt"]];
 
