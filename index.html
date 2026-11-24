@@ -138,7 +138,7 @@ const KEY=[
  ["sales","Kitchen sales","$","K",300,3000,50,""],
  ["comm","Delivery commission","","%",0,30,.5,"App rates 15% to 30%"],
  ["fee","Facility fee / month","$","",2000,12000,250,"Tenant reports $4K to $7K"],
- ["staff","Kitchen staff","","FTE",1,15,1,"CAVA's ~$196K sales per employee: 8 at $1.6M, 5 at $926K"],
+ ["pt","Part-time hours / week","","hrs",0,200,1,"~217 hrs/wk needed: lead 45 + 2 full-time 80 + part-time on peaks"],
  ["cann","Sales moved from CAVA restaurants","","%",0,80,5,"0% if no CAVA restaurant delivers to the area"],
  ["upfront","Upfront investment","$","K",30,400,10,"CloudKitchens cites $100K to $200K"]];
 // [id, label, prefix, suffix, default, step, note]
@@ -147,10 +147,13 @@ const FIX=[
  ["proc","Processing fee","","%",3,.5,"Press reports of tenant terms"],
  ["mkt","Marketing","","%",3,.5,"Established brand; Uber platform average ~2%"],
  ["sup","Supplies and misc","","%",2,.5,"Assumed"],
- ["pay","Cost per staff","$","K",50.31,1,"Las Vegas cook pay + benefits"],
+ ["lead","Kitchen lead","$","K",98.77,1,"$80K salary + benefits (CAVA GM postings $70K-$90K)"],
+ ["ftn","Full-time crew","","FTE",2,1,"Core for open, close and food safety"],
+ ["pay","Cost per full-time crew","$","K",50.31,1,"Las Vegas cook pay $19.59/hr + benefits"],
+ ["ptr","Part-time cost per hour","$","",21.55,.25,"$19.59/hr + ~10% payroll taxes; lighter benefit plan"],
  ["flow","Restaurant profit lost per $ moved","","%",24.74,1,"CAVA restaurant margin"],
  ["hurdle","Required ROIC","","%",40,5,"CAVA: 40%+ year-one cash-on-cash"]];
-const SC={base:[1600,15,7500,8,0,150],low:[926,15,7500,5,0,150],overlap:[1600,15,7500,8,25,150]};
+const SC={base:[1600,15,7500,92,0,150],low:[926,15,7500,57,0,150],overlap:[1600,15,7500,92,25,150]};
 const PCT=[[10,926],[20,1100],[30,1200],[40,1400],[50,1600],[60,1700],[70,1800],[80,2200],[90,2900]];
 const LINES=[["Food and packaging","--c-food"],["Delivery commission","--c-plat"],["Processing fee","--c-plat"],["Facility fee","--c-site"],["Labor","--c-labor"],["Marketing","--c-mkt"],["Supplies and misc","--c-mkt"]];
 
@@ -197,7 +200,7 @@ function tween(el,to,fmt){
 
 function calc(){
   const S=num("sales"),U=num("upfront"),h=num("hurdle")/100;
-  const vals=[S*num("food")/100,S*num("comm")/100,S*num("proc")/100,num("fee")*.012,num("staff")*num("pay"),S*num("mkt")/100,S*num("sup")/100];
+  const vals=[S*num("food")/100,S*num("comm")/100,S*num("proc")/100,num("fee")*.012,num("lead")+num("ftn")*num("pay")+num("pt")*52*num("ptr")/1000,S*num("mkt")/100,S*num("sup")/100];
   const cann=S*num("cann")*num("flow")/1e4, net=S-vals.reduce((a,b)=>a+b,0)-cann, roic=U?net/U:0, go=net>0&&roic>=h;
   const m=1-(num("food")+num("comm")+num("proc")+num("mkt")+num("sup"))/100-num("cann")*num("flow")/1e4;
   const need=m>0?(h*U+vals[3]+vals[4])/m:Infinity;
