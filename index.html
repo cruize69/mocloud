@@ -32,9 +32,9 @@ h1{font-size:24px;line-height:1.15;margin:20px 0 4px;letter-spacing:-.01em}
 #verdict.no{background:var(--nobg);border-color:var(--no)}
 #pill{grid-row:span 2;font-weight:800;font-size:20px;padding:12px 14px;border-radius:12px;color:#fff;background:var(--go);transition:background .3s;min-width:78px;text-align:center}
 .no #pill{background:var(--no)}
-#nums{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
+#nums{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
 #nums div{display:grid}
-#nums b{font:700 26px var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+#nums b{font:700 22px var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 #nums span{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
 #why{font-size:14px;color:var(--ink)}
 
@@ -103,7 +103,7 @@ footer b{color:var(--ink)}
 
   <div id="verdict" aria-live="polite">
     <div id="pill">GO</div>
-    <div id="nums"><div><b id="n-roic">0%</b><span>ROIC</span></div><div><b id="n-net">$0K</b><span>Profit / yr</span></div></div>
+    <div id="nums"><div><b id="n-roic">0%</b><span>ROIC</span></div><div><b id="n-net">$0K</b><span>Profit / yr</span></div><div><b id="n-pay">–</b><span>Payback</span></div></div>
     <div id="why"></div>
   </div>
 
@@ -203,7 +203,9 @@ function calc(){
   const need=m>0?(h*U+vals[3]+vals[4])/m:Infinity;
   $("verdict").className=go?"":"no"; $("pill").textContent=go?"GO":"NO GO";
   tween($("n-roic"),roic*100,x=>P(x)); tween($("n-net"),net,K);
-  $("why").textContent=(isFinite(need)?`Needs ${K(need)} sales (${where(need)}) to clear ${P(h*100)}.`:"No sales level clears the hurdle.")+(net>0?` Pays back in ${Math.round(U/net*12)} months.`:" Never pays back.");
+  const pay=net>0?Math.round(U/net*12):null;
+  $("n-pay").textContent=pay===null?"Never":pay+" mo";
+  $("why").textContent=isFinite(need)?`Needs ${K(need)} sales (${where(need)}) to clear ${P(h*100)}.`:"No sales level clears the hurdle.";
   $("pctl").textContent=`${K(S)} is ${where(S)} of CloudKitchens locations · median $1.6M`;
   const rows=[S,...vals,cann,net];
   rows.forEach((x,i)=>{const ln=$("ln"+i),neg=i>0&&i<9;
@@ -212,7 +214,7 @@ function calc(){
     ln.querySelector(".bar i").style.width=S?Math.min(100,Math.abs(x)/S*100)+"%":"0";
   });
   $("ln9").style.setProperty("--c",net<0?"var(--no)":"var(--go)");
-  tween($("roic-v"),roic*100,x=>P(x)); $("roic-s").textContent=`${K(net)} ÷ ${K(U)} upfront · hurdle ${P(h*100)}`;
+  tween($("roic-v"),roic*100,x=>P(x)); $("roic-s").textContent=`${K(net)} ÷ ${K(U)} upfront · hurdle ${P(h*100)} · payback ${pay===null?"never":pay+" months"}`;
   $("roic-v").style.color=go?"var(--go)":"var(--no)";
   FIX.forEach(([id,,,,d])=>$(id+"-w").classList.toggle("edited",Math.abs(num(id)-d)>1e-9));
 }
