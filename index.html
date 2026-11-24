@@ -28,15 +28,17 @@ h1{font-size:24px;line-height:1.15;margin:20px 0 4px;letter-spacing:-.01em}
 .by{margin:0;color:var(--mute);font-size:15px}
 .by b{color:var(--ink);font-weight:600}
 
-#verdict{position:sticky;top:env(safe-area-inset-top);z-index:2;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center;padding:14px 16px;border-radius:18px;background:var(--gobg);border:2px solid var(--go);transition:background .3s,border-color .3s;box-shadow:0 6px 18px -12px rgba(0,0,0,.35)}
+#verdict{position:sticky;top:env(safe-area-inset-top);z-index:2;display:grid;gap:12px;padding:14px;border-radius:18px;background:var(--gobg);border:2px solid var(--go);transition:background .3s,border-color .3s;box-shadow:0 6px 18px -12px rgba(0,0,0,.35)}
 #verdict.no{background:var(--nobg);border-color:var(--no)}
-#pill{grid-row:span 2;font-weight:800;font-size:20px;padding:12px 14px;border-radius:12px;color:#fff;background:var(--go);transition:background .3s;min-width:78px;text-align:center}
+.vhead{display:flex;align-items:center;gap:10px}
+#pill{font-weight:800;font-size:15px;letter-spacing:.04em;padding:6px 12px;border-radius:999px;color:var(--card);background:var(--go);transition:background .3s;white-space:nowrap}
 .no #pill{background:var(--no)}
-#nums{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
-#nums div{display:grid}
-#nums b{font:700 22px var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-#nums span{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
-#why{font-size:14px;color:var(--ink)}
+#vlab{font-weight:600;font-size:15px}
+#nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#nums div{display:grid;gap:2px;padding:10px 8px;border-radius:12px;background:var(--card);text-align:center}
+#nums b{font:700 20px var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap}
+#nums span{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+#why{font-size:13px;color:var(--mute)}
 
 .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .chips button{font:600 15px var(--sans);color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:14px;min-height:52px;padding:6px 8px;line-height:1.15;cursor:pointer}
@@ -102,7 +104,7 @@ footer b{color:var(--ink)}
   </header>
 
   <div id="verdict" aria-live="polite">
-    <div id="pill">GO</div>
+    <div class="vhead"><span id="pill">GO</span><span id="vlab"></span></div>
     <div id="nums"><div><b id="n-roic">0%</b><span>ROIC</span></div><div><b id="n-net">$0K</b><span>Profit / yr</span></div><div><b id="n-pay">–</b><span>Payback</span></div></div>
     <div id="why"></div>
   </div>
@@ -205,7 +207,8 @@ function calc(){
   tween($("n-roic"),roic*100,x=>P(x)); tween($("n-net"),net,K);
   const pay=net>0?Math.round(U/net*12):null;
   $("n-pay").textContent=pay===null?"Never":pay+" mo";
-  $("why").textContent=isFinite(need)?`Needs ${K(need)} sales (${where(need)}) to clear ${P(h*100)}.`:"No sales level clears the hurdle.";
+  $("vlab").textContent=go?`Clears the ${P(h*100)} ROIC hurdle`:net<=0?"Loses money":`Below the ${P(h*100)} ROIC hurdle`;
+  $("why").textContent=isFinite(need)?`Passes from ${K(need)} in sales, ${where(need)} of CloudKitchens locations`:"No sales level clears the hurdle at these costs";
   $("pctl").textContent=`${K(S)} is ${where(S)} of CloudKitchens locations · median $1.6M`;
   const rows=[S,...vals,cann,net];
   rows.forEach((x,i)=>{const ln=$("ln"+i),neg=i>0&&i<9;
