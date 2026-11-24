@@ -138,7 +138,7 @@ const KEY=[
  ["sales","Kitchen sales","$","K",300,3000,50,""],
  ["comm","Delivery commission","","%",0,30,.5,"App rates 15% to 30%"],
  ["fee","Facility fee / month","$","",2000,12000,250,"Tenant reports $4K to $7K"],
- ["hrs","Labor hours / week","","hrs",80,400,1,"2 on every open hour + peak help + prep: ~217 hrs"],
+ ["staff","Kitchen staff","","FTE",1,15,1,"Lead + 2 full-time + part-timers on peaks = about 6 FTE"],
  ["cann","Sales moved from CAVA restaurants","","%",0,80,5,"0% if no CAVA restaurant delivers to the area"],
  ["upfront","Upfront investment","$","K",30,400,10,"CloudKitchens cites $100K to $200K"]];
 // [id, label, prefix, suffix, default, step, note]
@@ -147,10 +147,10 @@ const FIX=[
  ["proc","Processing fee","","%",3,.5,"Press reports of tenant terms"],
  ["mkt","Marketing","","%",3,.5,"Established brand; Uber platform average ~2%"],
  ["sup","Supplies and misc","","%",2,.5,"Assumed"],
- ["rate","Labor cost per hour","$","",26.80,.25,"Blend of a lead, 2 full-time and part-timers"],
+ ["pay","Cost per staff","$","K",50.4,.5,"Blended: lead, full-time and part-time pay + benefits"],
  ["flow","Restaurant profit lost per $ moved","","%",24.74,1,"CAVA restaurant margin"],
  ["hurdle","Required ROIC","","%",40,5,"CAVA: 40%+ year-one cash-on-cash"]];
-const SC={base:[1600,15,7500,217,0,150],low:[926,15,7500,182,0,150],overlap:[1600,15,7500,217,25,150]};
+const SC={base:[1600,15,7500,6,0,150],low:[926,15,7500,5,0,150],overlap:[1600,15,7500,6,25,150]};
 const PCT=[[10,926],[20,1100],[30,1200],[40,1400],[50,1600],[60,1700],[70,1800],[80,2200],[90,2900]];
 const LINES=[["Food and packaging","--c-food"],["Delivery commission","--c-plat"],["Processing fee","--c-plat"],["Facility fee","--c-site"],["Labor","--c-labor"],["Marketing","--c-mkt"],["Supplies and misc","--c-mkt"]];
 
@@ -197,7 +197,7 @@ function tween(el,to,fmt){
 
 function calc(){
   const S=num("sales"),U=num("upfront"),h=num("hurdle")/100;
-  const vals=[S*num("food")/100,S*num("comm")/100,S*num("proc")/100,num("fee")*.012,num("hrs")*52*num("rate")/1000,S*num("mkt")/100,S*num("sup")/100];
+  const vals=[S*num("food")/100,S*num("comm")/100,S*num("proc")/100,num("fee")*.012,num("staff")*num("pay"),S*num("mkt")/100,S*num("sup")/100];
   const cann=S*num("cann")*num("flow")/1e4, net=S-vals.reduce((a,b)=>a+b,0)-cann, roic=U?net/U:0, go=net>0&&roic>=h;
   const m=1-(num("food")+num("comm")+num("proc")+num("mkt")+num("sup"))/100-num("cann")*num("flow")/1e4;
   const need=m>0?(h*U+vals[3]+vals[4])/m:Infinity;
